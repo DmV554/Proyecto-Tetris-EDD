@@ -1,4 +1,4 @@
-#include <ncurses.h>
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -16,7 +16,7 @@ const char* nombresDePieza[7] = {"Cuadrado", "I", "L1", "L2", "Z", "S", "T"};
 void menu(int*);
 void ejecutarSeleccion(int, List*);
 void funcionJugar(List*);
-void inicializarBloques(List*)
+void inicializarBloques(List*);
 void mostrarPuntajes();
 void mostrarBloques(List*);
 void inicializarBloques(List*);
@@ -61,6 +61,9 @@ void inicializarBloques(List*listaBloques) {
     //dou();
 }
 
+void mostrarPuntajes() {
+    return;
+}
 
 void menu(int*seleccionPtr) {
     initscr(); // Inicializar ncurses
@@ -72,12 +75,13 @@ void menu(int*seleccionPtr) {
     while (opcion != ENTER) {
         clear(); // Limpiar la pantalla
 
-        printw("MENU\n");
-        printw("----------------\n");
-        printw("%s Jugar\n", (seleccion == 1) ? "->" : "  ");
-        printw("%s Mostrar puntajes\n", (seleccion == 2) ? "->" : "  ");
-        printw("%s Mostrar bloques\n", (seleccion == 3) ? "->" : "  ");
-        printw("%s Salir\n", (seleccion == 4) ? "->" : "  ");
+        printw("               MENU\n");
+        printw("--------------------------------------\n");
+        printw("            %s Jugar\n", (seleccion == 1) ? "->" : "  ");
+        printw("            %s Mostrar puntajes\n", (seleccion == 2) ? "->" : "  ");
+        printw("            %s Mostrar bloques\n", (seleccion == 3) ? "->" : "  ");
+        printw("            %s Instrucciones\n", (seleccion == 4) ? "->" : "  ");
+        printw("            %s Salir\n", (seleccion == 5) ? "->" : "  ");
 
         refresh(); // Actualizar la pantalla
 
@@ -89,7 +93,7 @@ void menu(int*seleccionPtr) {
                     seleccion--;
                 break;
             case KEY_DOWN:
-                if (seleccion < 4)
+                if (seleccion < 5)
                     seleccion++;
                 break;
             case ENTER:
@@ -102,8 +106,9 @@ void menu(int*seleccionPtr) {
         }
     }
 
-    endwin(); // Finalizar ncurses
     refresh(); // Actualizar la pantalla
+
+    endwin(); // Finalizar ncurses
 }
 
 
@@ -119,7 +124,7 @@ void ejecutarSeleccion(int seleccion, List*listaBloques) {
         break;
 
         case 3:
-            mostrarBloques();
+            mostrarBloques(listaBloques);
         break;
 
         case 4:
@@ -132,15 +137,13 @@ void ejecutarSeleccion(int seleccion, List*listaBloques) {
 }
 
 void mostrarBloques(List*listaBloques) {
-    initscr();
-        move(0,0);
-    endwin();
+    move(0,0);
 
     Bloque*nodoBloque = firstList(listaBloques);
     int sizeLista = sizeList(listaBloques);
 
     for(int i=0; i<sizeLista; i++) {
-        printf("\n%s\n", nodoBloque->nombre);
+        printf("\n%s\n", nombresDePieza[i]);
 
         for(int j=0; j<nodoBloque->ancho; j++) {
             for(int k=0; k<nodoBloque->ancho; k++) {
@@ -190,8 +193,7 @@ Bloque* obtenerBloqueAleatorio(List* listaBloques) {
     return bloqueAleatorio;
 }
 
-void dibujarMatrizJuego(int **matrizJuego) {
-    initscr();  
+void dibujarMatrizJuego(int **matrizJuego) { 
     int i, j;
 
     // Dibujar la matriz de juego en la pantalla
@@ -210,11 +212,9 @@ void dibujarMatrizJuego(int **matrizJuego) {
             }
         }
     }
-    endwin();
 }
 
 void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
-    initscr();
     int i, j;
 
     // Dibujar el bloque en la posición actual
@@ -230,7 +230,7 @@ void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
             }
         }
     }
-    endwin();
+    
 }
 
 Bloque*rotarBloqueHorario(Bloque*bloqueActual) {
@@ -297,8 +297,8 @@ int verificarFinJuego(int** matrizJuego) {
     return 0; // El juego continúa
 }
 
-void funcionJugar(List* listaBloques) {
-    initscr();  // Inicializar ncurses
+void funcionJugar(List* listaBloques) {  // Inicializar ncurses
+    initscr(); 
     keypad(stdscr, TRUE);  // Habilitar entrada de teclado
 
     int gameover = 0;
@@ -376,10 +376,12 @@ void funcionJugar(List* listaBloques) {
         //ajustarVelocidad(&speed, score);
     }
 
-    endwin();  // Finalizar ncurses
+  // Finalizar ncurses
 
     // Mostrar puntaje final, guardar puntaje, mensaje de finalización, etc.
    //mostrarPuntajeFinal(score);
     //guardarPuntaje(score);
     //mostrarMensajeFinal();
+    
+    endwin();
 }
