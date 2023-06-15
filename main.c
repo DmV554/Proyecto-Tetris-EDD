@@ -21,6 +21,9 @@ void mostrarPuntajes();
 void mostrarBloques(List*);
 void inicializarBloques(List*);
 Bloque* obtenerBloqueAleatorio(List*);
+void dibujarMatrizJuego(int**);
+void dibujarBloqueActual(Bloque* , int, int );
+Bloque* rotarBloqueHorario(Bloque*);
 
 int main() { 
     List*listaBloques = createList();
@@ -181,4 +184,57 @@ Bloque* obtenerBloqueAleatorio(List* listaBloques) {
     Bloque* bloqueAleatorio = obtenerElementoPorPosicion(listaBloques, indiceAleatorio);
     
     return bloqueAleatorio;
+}
+
+void dibujarMatrizJuego(int **matrizJuego) {
+    initscr();  
+    int i, j;
+
+    // Dibujar la matriz de juego en la pantalla
+    for (i = 0; i < ALTO_JUEGO; i++) {
+        for (j = 0; j < ANCHO_JUEGO; j++) {
+            int x = j;  // Coordenada horizontal en la pantalla
+            int y = i;  // Coordenada vertical en la pantalla
+
+            // Mueve el cursor a la posición (x, y) y dibuja el carácter correspondiente
+            move(y, x);
+
+            if (matrizJuego[i][j] == 0) {
+                addch('.');  // Carácter para celda vacía
+            } else {
+                addch('#');  // Carácter para celda ocupada por un bloque
+            }
+        }
+    }
+    endwin();
+}
+
+void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
+    initscr();
+    int i, j;
+
+    // Dibujar el bloque en la posición actual
+    for (i = 0; i < bloqueActual->ancho; i++) {
+        for (j = 0; j < bloqueActual->ancho; j++) {
+            if (bloqueActual->matrizBloque[i][j] != 0) {
+                int x = posX + j;
+                int y = posY + i;
+
+                // Mueve el cursor a la posición (x, y) y dibuja el bloque
+                move(y, x);
+                addch('#'); // Puedes usar otro carácter para representar el bloque
+            }
+        }
+    }
+    endwin();
+}
+
+Bloque*rotarBloqueHorario(Bloque*bloqueActual) {
+    Bloque*bloqueNodo = nextList(bloqueActual->listaRotaciones);
+
+    if(bloqueNodo == NULL) {
+        bloqueNodo = firstList(bloqueActual->listaRotaciones);
+    }
+
+    return bloqueNodo;
 }
