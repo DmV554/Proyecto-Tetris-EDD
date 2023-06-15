@@ -24,6 +24,7 @@ Bloque* obtenerBloqueAleatorio(List*);
 void dibujarMatrizJuego(int**);
 void dibujarBloqueActual(Bloque* , int, int );
 Bloque* rotarBloqueHorario(Bloque*);
+int verificarColisiones(Bloque*, int, int, int **);
 
 int main() { 
     List*listaBloques = createList();
@@ -107,7 +108,7 @@ void ejecutarSeleccion(int seleccion, List*listaBloques) {
     
     switch (seleccion) {
         case 1:
-            funcionJugar();
+            funcionJugar(listaBloques);
         break;
 
         case 2:
@@ -237,4 +238,28 @@ Bloque*rotarBloqueHorario(Bloque*bloqueActual) {
     }
 
     return bloqueNodo;
+}
+
+int verificarColisiones(Bloque* bloqueActual, int posX, int posY, int **matrizJuego) {
+    int i, j;
+
+    // Verificar colisión con los límites del tablero
+    for (i = 0; i < bloqueActual->ancho; i++) {
+        for (j = 0; j < bloqueActual->ancho; j++) {
+            if (bloqueActual->matrizBloque[i][j] != 0) {
+                int x = posX + j;
+                int y = posY + i;
+
+                if (x < 0 || x >= ANCHO_JUEGO || y >= ALTO_JUEGO) {
+                    return 1;  // Colisión con los límites del tablero
+                }
+
+                if (y >= 0 && matrizJuego[y][x] != 0) {
+                    return 1;  // Colisión con otro bloque fijo en el tablero
+                }
+            }
+        }
+    }
+
+    return 0;  // No hay colisión
 }
