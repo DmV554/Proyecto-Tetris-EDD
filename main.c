@@ -26,6 +26,8 @@ void dibujarBloqueActual(Bloque* , int, int );
 Bloque* rotarBloqueHorario(Bloque*);
 int verificarColisiones(Bloque*, int, int, int **);
 void fijarBloqueEnMatriz(Bloque*, int, int , int **);
+int verificarFinJuego(int**);
+
 
 int main() { 
     List*listaBloques = createList();
@@ -282,4 +284,102 @@ void fijarBloqueEnMatriz(Bloque* bloqueActual, int posX, int posY, int **matrizJ
             }
         }
     }
+}
+
+int verificarFinJuego(int** matrizJuego) { 
+    // Verificar si alguna celda de la primera fila está ocupada
+    for (int j = 0; j < ALTO_JUEGO; j++) {
+        if (matrizJuego[0][j] != 0) {
+            return 1; // Fin de juego alcanzado
+        }
+    }
+
+    return 0; // El juego continúa
+}
+
+void funcionJugar(List* listaBloques) {
+    initscr();  // Inicializar ncurses
+    keypad(stdscr, TRUE);  // Habilitar entrada de teclado
+
+    int gameover = 0;
+    int score = 0;
+    int speed = 1;
+
+    // Obtener un bloque aleatorio de la lista de bloques
+    Bloque* bloqueActual = obtenerBloqueAleatorio(listaBloques);
+
+    
+    // Inicializar la matriz de juego
+    int**matrizJuego = (int**)calloc(ALTO_JUEGO, sizeof(int*));
+    for (int i = 0; i < ALTO_JUEGO; i++) {
+        matrizJuego[i] = (int*)calloc(ANCHO_JUEGO, sizeof(int));
+    }
+
+    // Posición inicial del bloque actual
+    int posX = ANCHO_JUEGO / 2;
+    int posY = 0;
+
+    while (!gameover) {
+        clear();  // Limpiar pantalla
+
+        // Dibujar la matriz de juego y el bloque actual en la pantalla
+        dibujarMatrizJuego(matrizJuego);
+        dibujarBloqueActual(bloqueActual, posX, posY);
+           
+        refresh();  // Actualizar pantalla
+
+        // Esperar la entrada del usuario
+        int tecla = getch();  // Leer la tecla presionada
+
+        switch (tecla) {
+            case KEY_LEFT:
+                // Mover el bloque actual hacia la izquierda
+                posX--;
+
+                break;
+            case KEY_RIGHT:
+                // Mover el bloque actual hacia la derecha
+                posX++;
+
+                break;
+            case KEY_DOWN:
+                // Mover el bloque actual hacia abajo
+                posY++;
+
+                break;
+            case KEY_UP:
+                // Rotar el bloque actual en sentido horario
+                bloqueActual = rotarBloqueHorario(bloqueActual);
+                break;
+            case 'q':
+                gameover = 1;
+                break;
+            default:
+                break;
+        }
+
+        // Verificar colisiones y actualizar el estado del juego
+        if (verificarColisiones(bloqueActual, posX, posY, matrizJuego)) {
+            fijarBloqueEnMatriz(bloqueActual, posX, posY, matrizJuego);
+            //eliminarLineasCompletas(matrizJuego, &score);
+            bloqueActual = obtenerBloqueAleatorio(listaBloques);
+            posX = ANCHO_JUEGO / 2;
+            posY = 0;
+
+            // Verificar condiciones de finalización del juego y actualizar gameover si es necesario
+            if (verificarFinJuego(matrizJuego)) {
+                gameover = 1;
+            }
+        }
+
+        // Ajustar la velocidad del juego según el puntaje, si es necesario
+        //ajustarVelocidad(&speed, score);
+    }
+
+    endwin();  // Finalizar ncurses
+
+    // Mostrar puntaje final, guardar puntaje, mensaje de finalización, etc.
+   //mostrarPuntajeFinal(score);
+    //guardarPuntaje(score);
+    //mostrarMensajeFinal();
 }
