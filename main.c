@@ -5,11 +5,18 @@
 #include <string.h>
 #include <ctype.h>
 #include "list.h"
+#include "bloques.h"
+
 #define ENTER 10
+#define ALTO_JUEGO 20
+#define ANCHO_JUEGO 10
+
+const char* nombresDePieza[7] = {"Cuadrado", "I", "L1", "L2", "Z", "S", "T"};
 
 void menu(int*);
 void ejecutarSeleccion(int, List*);
-void funcionJugar();
+void funcionJugar(List*);
+void inicializarBloques(List*)
 void mostrarPuntajes();
 void mostrarBloques();
 void inicializarBloques(List*);
@@ -25,6 +32,25 @@ int main() {
 
 
     return 0;
+}
+
+void inicializarBloques(List*listaBloques) {
+
+    inicializarCuadrado(listaBloques);
+
+    inicializarL1(listaBloques);
+
+    inicializarL2(listaBloques);
+
+    inicializarI(listaBloques);
+
+    inicializarT(listaBloques);
+
+    inicializarZ(listaBloques);
+
+    inicializarS(listaBloques);
+
+    //dou();
 }
 
 
