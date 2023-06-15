@@ -18,8 +18,9 @@ void ejecutarSeleccion(int, List*);
 void funcionJugar(List*);
 void inicializarBloques(List*)
 void mostrarPuntajes();
-void mostrarBloques();
+void mostrarBloques(List*);
 void inicializarBloques(List*);
+Bloque* obtenerBloqueAleatorio(List*);
 
 int main() { 
     List*listaBloques = createList();
@@ -121,4 +122,63 @@ void ejecutarSeleccion(int seleccion, List*listaBloques) {
         default:
         break;
     }
+}
+
+void mostrarBloques(List*listaBloques) {
+    initscr();
+        move(0,0);
+    endwin();
+
+    Bloque*nodoBloque = firstList(listaBloques);
+    int sizeLista = sizeList(listaBloques);
+
+    for(int i=0; i<sizeLista; i++) {
+        printf("\n%s\n", nodoBloque->nombre);
+
+        for(int j=0; j<nodoBloque->ancho; j++) {
+            for(int k=0; k<nodoBloque->ancho; k++) {
+                printf("%d ", nodoBloque->matrizBloque[j][k]);  
+            }
+
+            
+            printf("\n");
+        }
+
+        int **matrizRotacion = firstList(nodoBloque->listaRotaciones);
+        int sizeListaRotaciones = sizeList(nodoBloque->listaRotaciones);
+
+        if(sizeListaRotaciones != 0) {
+            printf("\nRotaciones:\n");
+        }
+
+        for(int l=0; l<sizeListaRotaciones; l++) {
+            if(l!=0) {
+                printf("\n");
+                for(int m=0; m<nodoBloque->ancho; m++) {
+                    for(int n=0; n<nodoBloque->ancho; n++) {
+                        printf("%d ", matrizRotacion[m][n]);
+                    }
+                    printf("\n");
+                }    
+            }
+            matrizRotacion = nextList(nodoBloque->listaRotaciones);
+        }
+
+        nodoBloque = nextList(listaBloques);
+        printf("\n\n");
+    }
+    
+}
+
+Bloque* obtenerBloqueAleatorio(List* listaBloques) {
+    // Obtener el tamaño de la lista de bloques
+    int sizeLista = sizeList(listaBloques);
+
+    // Generar un número aleatorio entre 0 y sizeLista-1
+    int indiceAleatorio = rand() % sizeLista;
+
+    // Obtener el bloque en el índice aleatorio de la lista
+    Bloque* bloqueAleatorio = obtenerElementoPorPosicion(listaBloques, indiceAleatorio);
+    
+    return bloqueAleatorio;
 }
