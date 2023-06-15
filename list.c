@@ -184,3 +184,39 @@ void cleanList(List * list) {
         popFront(list);
     }
 }
+
+int sizeList(List * list) {
+    if (list == NULL || list->head == NULL) {
+        return 0;
+    }
+    
+    int size = 0;
+    Node * current = list->head;
+    
+    do {
+        size++;
+        current = current->next;
+    } while (current != list->head);
+    
+    return size;
+}
+
+void* obtenerElementoPorPosicion(List* list, int position) {
+    if (position < 0 || sizeList(list) == 0) {
+        return NULL;  // Si la posición es inválida o la lista está vacía
+    }
+    
+    list->current = list->head;
+    int count = 0;
+
+    while (count < position) {
+        list->current = list->current->next;
+        count++;
+
+        if (list->current == list->head) {
+            return NULL;  // Si se ha completado una vuelta completa en la lista sin encontrar la posición deseada
+        }
+    }
+
+    return (void*)list->current->data;
+}
