@@ -27,6 +27,8 @@ void * popCurrent(List * list);
 
 void cleanList(List * list);
 
+int sizeList(List * list);
+
+void * obtenerElementoPorPosicion(List* list, const int);
+
 #endif /* List_h */
-
-
