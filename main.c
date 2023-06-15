@@ -25,6 +25,7 @@ void dibujarMatrizJuego(int**);
 void dibujarBloqueActual(Bloque* , int, int );
 Bloque* rotarBloqueHorario(Bloque*);
 int verificarColisiones(Bloque*, int, int, int **);
+void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 
 int main() { 
     List*listaBloques = createList();
@@ -262,4 +263,23 @@ int verificarColisiones(Bloque* bloqueActual, int posX, int posY, int **matrizJu
     }
 
     return 0;  // No hay colisión
+}
+
+void fijarBloqueEnMatriz(Bloque* bloqueActual, int posX, int posY, int **matrizJuego) {
+    int i, j;
+
+    // Colocar el bloque en la matriz de juego en la posición indicada
+    for (i = 0; i < bloqueActual->ancho; i++) {
+        for (j = 0; j < bloqueActual->ancho; j++) {
+            if (bloqueActual->matrizBloque[i][j] != 0) {
+                int x = posX + j;
+                int y = posY + i;
+
+                // Verificar si la posición está dentro de los límites de la matriz de juego
+                if (x >= 0 && x < ANCHO_JUEGO && y >= 0 && y < ALTO_JUEGO) {
+                    matrizJuego[y][x] = 1;  // Marcar la celda como ocupada por el bloque
+                }
+            }
+        }
+    }
 }
