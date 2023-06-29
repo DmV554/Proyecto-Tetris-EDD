@@ -369,62 +369,42 @@ void crearRotacionesT(List* listaRotaciones){
     pushBack(listaRotaciones, bloqueRotado3);
 }
 
-void crearRotacionesT(List* listaRotaciones){
+void inicializarZ(List*listaBloques){
+    Bloque*z = (Bloque*)malloc(sizeof(Bloque));
 
-    BloqueRotado*bloqueRotado1 = malloc(sizeof(BloqueRotado));
-    bloqueRotado1->matrizBloque = (int**)malloc(3* sizeof(int*));
-    for (int i = 0; i < 3; i++) {
-        bloqueRotado1->matrizBloque[i] = (int*)malloc(2* sizeof(int));
-    }
-
-    bloqueRotado1->matrizBloque[0][0] = 1;
-    bloqueRotado1->matrizBloque[0][1] = 0;
-    bloqueRotado1->matrizBloque[1][0] = 1;
-    bloqueRotado1->matrizBloque[1][1] = 1;
-    bloqueRotado1->matrizBloque[2][0] = 1;   
-    bloqueRotado1->matrizBloque[2][1] = 0;
-
-    bloqueRotado1->alto = 3;
-    bloqueRotado1->ancho = 2;
-
-    pushBack(listaRotaciones, bloqueRotado1);
-
-    BloqueRotado*bloqueRotado2 = malloc(sizeof(BloqueRotado));
-
-    bloqueRotado2->matrizBloque = (int**)malloc(2* sizeof(int*));
+    z->tipo = Z;
+    
+    z->matrizBloque = (int**)malloc(2* sizeof(int*));
     for (int i = 0; i < 2; i++) {
-        bloqueRotado2->matrizBloque[i] = (int*)malloc(3* sizeof(int));
+        z->matrizBloque[i] = (int*)malloc(3* sizeof(int));
     }
 
-    bloqueRotado2->matrizBloque[0][0] = 1;
-    bloqueRotado2->matrizBloque[0][1] = 1;
-    bloqueRotado2->matrizBloque[0][2] = 1;
-    bloqueRotado2->matrizBloque[1][0] = 0;
-    bloqueRotado2->matrizBloque[1][1] = 1;   
-    bloqueRotado2->matrizBloque[1][2] = 0;
+    z->matrizBloque[0][0] = 1;
+    z->matrizBloque[0][1] = 1;
+    z->matrizBloque[0][2] = 0;
+    z->matrizBloque[1][0] = 0;
+    z->matrizBloque[1][1] = 1;   
+    z->matrizBloque[1][2] = 1;
 
-    bloqueRotado2->alto = 2;
-    bloqueRotado2->ancho = 3;
+    z->listaRotaciones = createList();
+    BloqueRotado*BloqueRotado0 = malloc(sizeof(BloqueRotado));
 
-    pushBack(listaRotaciones, bloqueRotado2);
+    //BloqueRotado0->matrizBloque = z->matrizBloque;
 
-    BloqueRotado*bloqueRotado3 = malloc(sizeof(BloqueRotado));
-    bloqueRotado3->matrizBloque = (int**)malloc(3* sizeof(int*));
-    for (int i = 0; i < 3; i++) {
-        bloqueRotado3->matrizBloque[i] = (int*)malloc(2* sizeof(int));
+    BloqueRotado0->matrizBloque = (int**)malloc(2 * sizeof(int*));
+    for (int i = 0; i < 2; i++) {
+        BloqueRotado0->matrizBloque[i] = (int*)malloc(3 * sizeof(int));
+        memcpy(BloqueRotado0->matrizBloque[i], z->matrizBloque[i], 3 * sizeof(int));
     }
 
-    bloqueRotado3->matrizBloque[0][0] = 0;
-    bloqueRotado3->matrizBloque[0][1] = 1;
-    bloqueRotado3->matrizBloque[1][0] = 1;
-    bloqueRotado3->matrizBloque[1][1] = 1;
-    bloqueRotado3->matrizBloque[2][0] = 0;
-    bloqueRotado3->matrizBloque[2][1] = 1;
+    BloqueRotado0->alto = 2;
+    BloqueRotado0->ancho = 3;
+    pushBack(z->listaRotaciones, BloqueRotado0);
 
-    bloqueRotado3->alto = 3;
-    bloqueRotado3->ancho = 2;
-
-    pushBack(listaRotaciones, bloqueRotado3);
+    z->ancho = 3;
+    z->alto = 2;
+    crearRotacionesZ(z->listaRotaciones);
+    pushBack(listaBloques, z);     
 }
 
 
