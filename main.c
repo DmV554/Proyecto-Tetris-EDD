@@ -8,6 +8,7 @@
 #include "bloques.h"
 #include "treemap.h"
 #include <unistd.h>
+#include <stdbool.h>
 
 #define ENTER 10
 #define ALTO_JUEGO 20
