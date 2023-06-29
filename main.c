@@ -25,7 +25,7 @@ void menu(int*);
 void ejecutarSeleccion(int, List*, TreeMap*);
 void funcionJugar(List*, TreeMap*);
 void inicializarBloques(List*);
-void mostrarPuntajes();
+void mostrarPuntajes(TreeMap*);
 void mostrarBloques(List*);
 void inicializarBloques(List*);
 Bloque* obtenerBloqueAleatorio(List*);
@@ -39,6 +39,7 @@ void imprimirTetris(int);
 void eliminarLineasCompletas(int**,size_t*,int*);
 void asignarJugador(size_t, TreeMap*, char*);
 void selectorDificultad(int*, char*);
+void imprimirPuntajes(char*, TreeMap*);
 
 int lower_than_int(void * key1, void * key2) {
     if(*(int*)key1 > *(int*)key2) return 1;
@@ -81,9 +82,121 @@ void inicializarBloques(List*listaBloques) {
     //dou();
 }
 
-void mostrarPuntajes() {
-    return;
+void imprimirPuntajes(char * nivel, TreeMap * Jugadores){
+    clear();
+    int maxRows, maxCols;
+    getmaxyx(stdscr, maxRows, maxCols);
+
+    char mensajeTS[20];
+    strcpy(mensajeTS, "TOP SCORES");
+
+    int posX = (maxCols - strlen(mensajeTS)) / 2;
+
+
+    mvprintw(0,posX,"%s %s\n", mensajeTS, nivel);
+    refresh();
+    int cont = 1;
+    
+    Pair* pairJugador = firstTreeMap(Jugadores);
+    Jugador * jugador = pairJugador->value;
+    int i = 5;
+    
+    while(jugador != NULL || cont == 10){
+        if(strcmp(jugador->dificultad, nivel) == 0){
+            move(i,65);
+            printw("%2d. %-20s %d\n", cont, jugador->nombre, jugador->puntaje);
+            cont++;
+            i++;
+            refresh();
+        }     
+        pairJugador = nextTreeMap(Jugadores);
+        if(pairJugador == NULL) break;
+        jugador = pairJugador->value;
+    }
 }
+
+void mostrarPuntajes(TreeMap* Jugadores) {
+
+    initscr(); 
+    nodelay(stdscr, FALSE);
+    keypad(stdscr, TRUE); // Habilitar el uso de teclas especiales
+    curs_set(0);
+
+    clear();
+    
+    Pair* pairJugador = firstTreeMap(Jugadores);
+    
+    if(pairJugador==NULL){
+        move(0,0);
+        move(0,65);
+        printw("No hay jugadores registrados\n");
+        refresh();
+        getch();
+        endwin();
+        return;
+    }
+    
+    int opcion = 0;
+    int seleccion = 1;
+    char nivel[10];
+
+    while (opcion != ENTER) {
+        clear();
+
+        printw("Elige que puntajes deseas ver segun la dificultad:\n");
+        printw("---------------------------------------------------\n");
+        printw("            %s Facil \n", (seleccion == 1) ? "->" : "  ");
+        printw("            %s Normal \n", (seleccion == 2) ? "->" : "  ");
+        printw("            %s Dificil \n", (seleccion == 3) ? "->" : "  ");
+
+        refresh();
+
+        int tecla = getch(); 
+
+        switch (tecla) {
+            case KEY_UP:
+                if (seleccion > 1)
+                    seleccion--;
+                break;
+            case KEY_DOWN:
+                if (seleccion < 3)
+                    seleccion++;
+                break;
+            case ENTER:
+                opcion = tecla;
+                break;
+            default:
+                printw("Opcion invalida. Intente de nuevo.\n");
+                break;
+        }
+    }
+
+    clear(); 
+
+    switch (seleccion) {
+        case 1:
+            strcpy(nivel, "FACIL");
+            imprimirPuntajes(nivel, Jugadores);
+            break;
+        case 2:
+            strcpy(nivel, "NORMAL");
+            imprimirPuntajes(nivel, Jugadores);
+            break;
+        case 3:
+            strcpy(nivel, "DIFICIL");
+            imprimirPuntajes(nivel, Jugadores);
+            break;
+        default:
+            printw("Opcion invalida. Intente de nuevo.\n");
+            break;
+    }
+
+    
+    getch();
+
+    endwin();
+}
+
 
 void menu(int*seleccionPtr) {
     initscr(); // Inicializar ncurses
