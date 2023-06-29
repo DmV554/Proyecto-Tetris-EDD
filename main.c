@@ -27,7 +27,7 @@ Bloque* rotarBloqueHorario(Bloque*);
 int verificarColisiones(Bloque*, int, int, int **);
 void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 int verificarFinJuego(int**);
-
+void imprimirTetris(int);
 
 int main() { 
     List*listaBloques = createList();
@@ -67,21 +67,27 @@ void mostrarPuntajes() {
 
 void menu(int*seleccionPtr) {
     initscr(); // Inicializar ncurses
+    curs_set(0);
     keypad(stdscr, TRUE); // Habilitar el uso de teclas especiales
 
     int opcion = 0;
     int seleccion = *seleccionPtr;
 
+    int maxRows, maxCols;
+    getmaxyx(stdscr, maxRows, maxCols);
+
+    int posY = maxRows / 2;
+    int posX = maxCols / 2;
+
     while (opcion != ENTER) {
         clear(); // Limpiar la pantalla
 
-        printw("               MENU\n");
-        printw("--------------------------------------\n");
-        printw("            %s Jugar\n", (seleccion == 1) ? "->" : "  ");
-        printw("            %s Mostrar puntajes\n", (seleccion == 2) ? "->" : "  ");
-        printw("            %s Mostrar bloques\n", (seleccion == 3) ? "->" : "  ");
-        printw("            %s Instrucciones\n", (seleccion == 4) ? "->" : "  ");
-        printw("            %s Salir\n", (seleccion == 5) ? "->" : "  ");
+        imprimirTetris(posX-20);
+        mvprintw(posY+5,posX-10,"%s Jugar\n", (seleccion == 1) ? "->" : "  ");
+        mvprintw(posY+6,posX-10,"%s Mostrar puntajes\n", (seleccion == 2) ? "->" : "  ");
+        mvprintw(posY+7,posX-10,"%s Mostrar bloques\n", (seleccion == 3) ? "->" : "  ");
+        mvprintw(posY+8,posX-10,"%s Instrucciones\n", (seleccion == 4) ? "->" : "  ");
+        mvprintw(posY+9,posX-10,"%s Salir\n", (seleccion == 5) ? "->" : "  ");
 
         refresh(); // Actualizar la pantalla
 
@@ -107,8 +113,28 @@ void menu(int*seleccionPtr) {
     }
 
     refresh(); // Actualizar la pantalla
-
     endwin(); // Finalizar ncurses
+}
+
+void imprimirTetris(int posX) {           
+    start_color();            
+    init_pair(1, COLOR_RED, COLOR_BLACK); 
+    attron(COLOR_PAIR(1));     // Activar el par de colores definido
+
+    FILE* archivo = fopen("titulo_tetris.txt", "r");
+    
+    char linea[250];
+    int i = 4;
+    while (fgets(linea, 250, archivo) != NULL) {
+        mvprintw(i, posX, "%s", linea);
+        i++;
+    }
+
+    attroff(COLOR_PAIR(1));    // Desactivar el par de colores
+    refresh();                 // Actualizar la pantalla
+
+    fclose(archivo);         
+
 }
 
 
