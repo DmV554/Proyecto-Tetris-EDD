@@ -41,6 +41,7 @@ void asignarJugador(size_t, TreeMap*, char*);
 void selectorDificultad(int*, char*);
 void imprimirPuntajes(char*, TreeMap*);
 
+
 int lower_than_int(void * key1, void * key2) {
     if(*(int*)key1 > *(int*)key2) return 1;
     return 0;
@@ -467,43 +468,45 @@ int verificarFinJuego(int** matrizJuego) {
 
 void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncurses
     initscr(); 
-    keypad(stdscr, TRUE);  // Habilitar entrada de teclado
+    curs_set(0);
+    keypad(stdscr, TRUE);  
+    nodelay(stdscr, TRUE);
 
-
-    char* dificultad = (char*) malloc(sizeof(char) * 10);    
+    char *dificultad = (char*) malloc(sizeof(char) * 10);
+    
     selectorDificultad(&ANCHO_JUEGO, dificultad);
 
     int gameover = 0;
     size_t puntaje = 0;
     int nivel = 1;
-
-    // Obtener un bloque aleatorio de la lista de bloques
     Bloque* bloqueActual = obtenerBloqueAleatorio(listaBloques);
+    Bloque* bloqueAnterior = NULL;
 
-    
-    // Inicializar la matriz de juego
     int**matrizJuego = (int**)calloc(ALTO_JUEGO, sizeof(int*));
     for (int i = 0; i < ALTO_JUEGO; i++) {
         matrizJuego[i] = (int*)calloc(ANCHO_JUEGO, sizeof(int));
     }
 
-
     // Posición inicial del bloque actual
     int posX = ANCHO_JUEGO / 2;
     int posY = 0;
+ 
+    unsigned long long numBajada = 0;
+    unsigned long long limiteBajada = 100;
+    struct timespec tiempoPausa = {0, 10000000};
+    bool espacio = false;
 
     while (!gameover) {
-        clear();  // Limpiar pantalla
+        clear(); 
 
-        // Dibujar la matriz de juego y el bloque actual en la pantalla
-        dibujarMatrizJuego(matrizJuego);
+        dibujarMatrizJuego(matrizJuego,puntaje,nivel);
         dibujarBloqueActual(bloqueActual, posX, posY);
            
         refresh();  // Actualizar pantalla
 
-        // Esperar la entrada del usuario
-        int tecla = getch();  // Leer la tecla presionada
-
+        nanosleep(&tiempoPausa, NULL);
+        int tecla = getch();  
+        
         switch (tecla) {
             case KEY_LEFT:
                 // Mover el bloque actual hacia la izquierda
@@ -515,15 +518,21 @@ void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncur
                 posX++;
 
                 break;
-            case KEY_DOWN:
-                // Mover el bloque actual hacia abajo
-                posY++;
-
-                break;
             case KEY_UP:
                 // Rotar el bloque actual en sentido horario
                 rotarBloqueHorario(bloqueActual);
                 break;
+            case KEY_DOWN:
+                posY++;
+                break;
+            
+            case ' ':
+                tiempoPausa.tv_nsec = 0;
+                tiempoPausa.tv_sec = 0;
+                espacio = true;
+
+                break;
+                
             case 'q':
                 gameover = 1;
                 break;
@@ -531,26 +540,70 @@ void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncur
                 break;
         }
 
-        // Verificar colisiones y actualizar el estado del juego
-        if (verificarColisiones(bloqueActual, posX, posY, matrizJuego)) {
-            fijarBloqueEnMatriz(bloqueActual, posX, posY, matrizJuego);
-            eliminarLineasCompletas(matrizJuego,&puntaje,&nivel);
-            //eliminarLineasCompletas(matrizJuego, &score);
-            bloqueActual = obtenerBloqueAleatorio(listaBloques);
-            posX = ANCHO_JUEGO / 2;
-            posY = 0;
-
-
-
-            // Verificar condiciones de finalización del juego y actualizar gameover si es necesario
-            if (verificarFinJuego(matrizJuego)) {
-                gameover = 1;
+        if(espacio) {
+            posY++;
+        } else {
+            if(numBajada == limiteBajada - (nivel*2) ) {
+                posY++;
+                numBajada = 0;
+            } else {
+                numBajada++;
             }
         }
+        
+        if (verificarColisiones(bloqueActual, posX, posY, matrizJuego)) {
+            if (posX < 0) {
+                posX++;
+            } else if (posX + bloqueActual->ancho > ANCHO_JUEGO) {
+                posX--;
+            } else if(tecla == KEY_LEFT){
+                posX++;
+            } else if(tecla == KEY_RIGHT) {
+                posX--;
+            } else {
+                tiempoPausa.tv_nsec = 10000000;
+                tiempoPausa.tv_sec = 0;
+                posY--;
+                fijarBloqueEnMatriz(bloqueActual, posX, posY, matrizJuego);
+                eliminarLineasCompletas(matrizJuego,&puntaje,&nivel);
+
+                Bloque* nuevoBloqueActual = obtenerBloqueAleatorio(listaBloques);
+
+                // Verificar si el bloque actual es igual al bloque anterior
+                while (bloqueAnterior != NULL && bloqueAnterior == nuevoBloqueActual) {
+                    nuevoBloqueActual = obtenerBloqueAleatorio(listaBloques);
+                }
+
+                // Asignar el nuevo bloque actual
+                bloqueActual = nuevoBloqueActual;
+                
+                // Actualizar el bloque anterior
+                bloqueAnterior = bloqueActual;
+
+                posX = ANCHO_JUEGO / 2;
+                posY = 0;
+
+                espacio = false;
+            }
+        }
+
+
+        if (verificarFinJuego(matrizJuego)) {
+                gameover = 1;
+            }
     }
 
+    asignarJugador(puntaje, Jugadores, dificultad);
     
     endwin();
+
+    for (int i = 0; i < ALTO_JUEGO; i++) {
+        free(matrizJuego[i]);
+    }
+    
+    free(matrizJuego);
+    free(dificultad);
+    
 }
 
 
