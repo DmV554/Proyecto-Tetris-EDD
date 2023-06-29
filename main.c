@@ -12,7 +12,7 @@
 #define ALTO_JUEGO 20
 #define ANCHO_JUEGO 10
 
-const char* nombresDePieza[7] = {"Cuadrado", "I", "L1", "L2", "Z", "S", "T"};
+const char* nombresDePieza[7] = {"Cuadrado", "L1", "L2", "I", "T", "Z", "S"};
 
 typedef struct{
     char nombre[21];
@@ -154,15 +154,14 @@ void imprimirTetris(int posX) {
 }
 
 
-void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap*Jugadores) {
-    
+void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap * Jugadores) { 
     switch (seleccion) {
         case 1:
             funcionJugar(listaBloques);
         break;
 
         case 2:
-            mostrarPuntajes();
+            mostrarPuntajes(Jugadores);
         break;
 
         case 3:
@@ -170,56 +169,59 @@ void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap*Jugadores) {
         break;
 
         case 4:
-            return;
+            mostrarInstrucciones();
         break;
-        
+
+        case 5:
+            exit(0);
+        break;
+
         default:
         break;
     }
 }
 
 void mostrarBloques(List*listaBloques) {
-    move(0,0);
-
     Bloque*nodoBloque = firstList(listaBloques);
     int sizeLista = sizeList(listaBloques);
 
     for(int i=0; i<sizeLista; i++) {
         printf("\n%s\n", nombresDePieza[i]);
 
-        for(int j=0; j<nodoBloque->ancho; j++) {
+        for(int j=0; j<nodoBloque->alto; j++) {
             for(int k=0; k<nodoBloque->ancho; k++) {
                 printf("%d ", nodoBloque->matrizBloque[j][k]);  
             }
-
-            
             printf("\n");
         }
 
-        int **matrizRotacion = firstList(nodoBloque->listaRotaciones);
+        BloqueRotado* bloqueR = firstList(nodoBloque->listaRotaciones);
         int sizeListaRotaciones = sizeList(nodoBloque->listaRotaciones);
 
-        if(sizeListaRotaciones != 0) {
-            printf("\nRotaciones:\n");
-        }
-
-        for(int l=0; l<sizeListaRotaciones; l++) {
-            if(l!=0) {
-                printf("\n");
-                for(int m=0; m<nodoBloque->ancho; m++) {
-                    for(int n=0; n<nodoBloque->ancho; n++) {
-                        printf("%d ", matrizRotacion[m][n]);
-                    }
-                    printf("\n");
-                }    
+        if(bloqueR != NULL) {
+            if(sizeListaRotaciones != 0) {
+                printf("\nRotaciones:\n");
             }
-            matrizRotacion = nextList(nodoBloque->listaRotaciones);
-        }
 
+             for(int l=0; l<sizeListaRotaciones; l++) {
+                if(l!=0) {
+                    printf("\n");
+                    for(int m=0; m<bloqueR->alto; m++) {
+                        for(int n=0; n<bloqueR->ancho; n++) {
+                            printf("%d ", bloqueR->matrizBloque[m][n]);
+                        }
+                        printf("\n");
+                    }    
+                }
+                bloqueR = nextList(nodoBloque->listaRotaciones);
+            }
+        }
         nodoBloque = nextList(listaBloques);
         printf("\n\n");
     }
-    
+
+    printf("\nPresione cualquier tecla para continuar...");
+    getchar();
 }
 
 Bloque* obtenerBloqueAleatorio(List* listaBloques) {

@@ -20,6 +20,7 @@ void inicializarCuadrado(List*listaBloques) {
     cuadrado->matrizBloque[0][1] = 1;   
     cuadrado->matrizBloque[1][0] = 1;
     cuadrado->matrizBloque[1][1] = 1;
+    cuadrado->alto = 2;
     cuadrado->ancho = 2;
     pushBack(listaBloques, cuadrado);
 }
