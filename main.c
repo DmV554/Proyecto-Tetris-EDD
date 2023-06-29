@@ -473,13 +473,13 @@ void fijarBloqueEnMatriz(Bloque* bloqueActual, int posX, int posY, int **matrizJ
 
 int verificarFinJuego(int** matrizJuego) { 
     // Verificar si alguna celda de la primera fila está ocupada
-    for (int j = 0; j < ALTO_JUEGO; j++) {
-        if (matrizJuego[0][j] != 0) {
+    for (int i = 0; i < ANCHO_JUEGO; i++) {
+        if (matrizJuego[0][i] != 0) {
             return 1; // Fin de juego alcanzado
         }
     }
 
-    return 0; // El juego continúa
+    return 0;
 }
 
 void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncurses
