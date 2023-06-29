@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include "list.h"
 #include "bloques.h"
+#include "treemap.h"
 
 #define ENTER 10
 #define ALTO_JUEGO 20
@@ -13,8 +14,14 @@
 
 const char* nombresDePieza[7] = {"Cuadrado", "I", "L1", "L2", "Z", "S", "T"};
 
+typedef struct{
+    char nombre[21];
+    size_t puntaje;
+    char dificultad[10];
+}Jugador;
+
 void menu(int*);
-void ejecutarSeleccion(int, List*);
+void ejecutarSeleccion(int, List*, TreeMap*);
 void funcionJugar(List*);
 void inicializarBloques(List*);
 void mostrarPuntajes();
@@ -29,16 +36,25 @@ void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 int verificarFinJuego(int**);
 void imprimirTetris(int);
 
+int lower_than_int(void * key1, void * key2) {
+    if(*(int*)key1 > *(int*)key2) return 1;
+    return 0;
+}
+
+
 int main() { 
+    TreeMap* Jugadores = createTreeMap(lower_than_int);
     List*listaBloques = createList();
     inicializarBloques(listaBloques);
-
-    int seleccion = 1;
-    menu(&seleccion);
-
-    ejecutarSeleccion(seleccion, listaBloques);
-
-
+    
+    while(true) {
+        int seleccion = 1;
+        menu(&seleccion);
+        ejecutarSeleccion(seleccion, listaBloques, Jugadores);
+    } 
+    
+    free(listaBloques);
+    free(Jugadores);
     return 0;
 }
 
@@ -138,7 +154,7 @@ void imprimirTetris(int posX) {
 }
 
 
-void ejecutarSeleccion(int seleccion, List*listaBloques) {
+void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap*Jugadores) {
     
     switch (seleccion) {
         case 1:
