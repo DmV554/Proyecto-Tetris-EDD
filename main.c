@@ -7,6 +7,7 @@
 #include "list.h"
 #include "bloques.h"
 #include "treemap.h"
+#include <unistd.h>
 
 #define ENTER 10
 #define ALTO_JUEGO 20
@@ -22,7 +23,7 @@ typedef struct{
 
 void menu(int*);
 void ejecutarSeleccion(int, List*, TreeMap*);
-void funcionJugar(List*);
+void funcionJugar(List*, TreeMap*);
 void inicializarBloques(List*);
 void mostrarPuntajes();
 void mostrarBloques(List*);
@@ -35,6 +36,7 @@ int verificarColisiones(Bloque*, int, int, int **);
 void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 int verificarFinJuego(int**);
 void imprimirTetris(int);
+void eliminarLineasCompletas(int**,size_t*,int*);
 
 int lower_than_int(void * key1, void * key2) {
     if(*(int*)key1 > *(int*)key2) return 1;
@@ -157,7 +159,7 @@ void imprimirTetris(int posX) {
 void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap * Jugadores) { 
     switch (seleccion) {
         case 1:
-            funcionJugar(listaBloques);
+            funcionJugar(listaBloques, Jugadores);
         break;
 
         case 2:
@@ -169,7 +171,7 @@ void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap * Jugadores) {
         break;
 
         case 4:
-            mostrarInstrucciones();
+            //mostrarInstrucciones();
         break;
 
         case 5:
@@ -229,6 +231,7 @@ Bloque* obtenerBloqueAleatorio(List* listaBloques) {
     int sizeLista = sizeList(listaBloques);
 
     // Generar un número aleatorio entre 0 y sizeLista-1
+    srand(time(NULL));
     int indiceAleatorio = rand() % sizeLista;
 
     // Obtener el bloque en el índice aleatorio de la lista
@@ -341,13 +344,13 @@ int verificarFinJuego(int** matrizJuego) {
     return 0; // El juego continúa
 }
 
-void funcionJugar(List* listaBloques) {  // Inicializar ncurses
+void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncurses
     initscr(); 
     keypad(stdscr, TRUE);  // Habilitar entrada de teclado
 
     int gameover = 0;
-    int score = 0;
-    int speed = 1;
+    size_t puntaje = 0;
+    int nivel = 1;
 
     // Obtener un bloque aleatorio de la lista de bloques
     Bloque* bloqueActual = obtenerBloqueAleatorio(listaBloques);
@@ -358,6 +361,7 @@ void funcionJugar(List* listaBloques) {  // Inicializar ncurses
     for (int i = 0; i < ALTO_JUEGO; i++) {
         matrizJuego[i] = (int*)calloc(ANCHO_JUEGO, sizeof(int));
     }
+
 
     // Posición inicial del bloque actual
     int posX = ANCHO_JUEGO / 2;
@@ -405,27 +409,72 @@ void funcionJugar(List* listaBloques) {  // Inicializar ncurses
         // Verificar colisiones y actualizar el estado del juego
         if (verificarColisiones(bloqueActual, posX, posY, matrizJuego)) {
             fijarBloqueEnMatriz(bloqueActual, posX, posY, matrizJuego);
+            eliminarLineasCompletas(matrizJuego,&puntaje,&nivel);
             //eliminarLineasCompletas(matrizJuego, &score);
             bloqueActual = obtenerBloqueAleatorio(listaBloques);
             posX = ANCHO_JUEGO / 2;
             posY = 0;
+
+
 
             // Verificar condiciones de finalización del juego y actualizar gameover si es necesario
             if (verificarFinJuego(matrizJuego)) {
                 gameover = 1;
             }
         }
-
-        // Ajustar la velocidad del juego según el puntaje, si es necesario
-        //ajustarVelocidad(&speed, score);
     }
 
-  // Finalizar ncurses
-
-    // Mostrar puntaje final, guardar puntaje, mensaje de finalización, etc.
-   //mostrarPuntajeFinal(score);
-    //guardarPuntaje(score);
-    //mostrarMensajeFinal();
     
     endwin();
 }
+
+
+void eliminarLineasCompletas(int**matrizJuego,size_t*ptrPuntaje,int *ptrNivel) {
+    int i, j, k;
+    int lineaCompleta = 1;
+
+    size_t puntaje = *ptrPuntaje;
+    int nivel = *ptrNivel;
+
+    // Recorrer la matriz de juego desde abajo hacia arriba
+    for (i = ALTO_JUEGO - 1; i >= 0; i--) {
+        lineaCompleta = 1;
+
+        // Verificar si la línea actual está completa
+        for (j = 0; j < ANCHO_JUEGO; j++) {
+            if (matrizJuego[i][j] == 0) {
+                lineaCompleta = 0;
+                break;
+            }
+        }
+
+        // Si la línea está completa, eliminarla
+        if (lineaCompleta) {
+
+            // Aumentar el puntaje
+            puntaje += 100;
+
+            if(puntaje%300==0){
+                nivel++;
+            }
+
+            // Mover todas las líneas superiores una posición hacia abajo
+            for (k = i; k > 0; k--) {
+                for (j = 0; j < ANCHO_JUEGO; j++) {
+                    matrizJuego[k][j] = matrizJuego[k - 1][j];
+                }
+            }
+
+            // Limpiar la primera línea
+            for (j = 0; j < ANCHO_JUEGO; j++) {
+                matrizJuego[0][j] = 0;
+            }
+
+            i++;  // Revisar la misma línea nuevamente
+        }
+    }
+
+    *ptrPuntaje = puntaje;
+    *ptrNivel = nivel;
+}
+
