@@ -41,6 +41,7 @@ void eliminarLineasCompletas(int**,size_t*,int*);
 void asignarJugador(size_t, TreeMap*, char*);
 void selectorDificultad(int*, char*);
 void imprimirPuntajes(char*, TreeMap*);
+void mostrarInstrucciones();
 
 
 int lower_than_int(void * key1, void * key2) {
@@ -288,7 +289,7 @@ void ejecutarSeleccion(int seleccion, List*listaBloques, TreeMap * Jugadores) {
         break;
 
         case 4:
-            //mostrarInstrucciones();
+            mostrarInstrucciones();
         break;
 
         case 5:
@@ -779,4 +780,35 @@ void selectorDificultad(int* ancho, char *dificultad){
 
     refresh(); // Actualizar la pantalla
 
+}
+
+void mostrarInstrucciones(){
+    initscr();
+    clear();
+
+    mvprintw(0,1,"BIENVENIDX!\n");
+    mvprintw(1,1,"INSTRUCCIONES TETRIS\n");
+    mvprintw(2,1, "----------------------------------------------------------------\n");
+    mvprintw(3,1, "Objetivo del juego\n");
+    mvprintw(4,1, "El objetivo del tetris es completar lineas horizontales con los\n");
+    mvprintw(5,1, "bloques que caen desde la parte superior de la pantalla.\n");
+    mvprintw(6,1, "Cada vez que completes una fila, se aumentará tu puntaje y cada 300\n");
+    mvprintw(7,1, "puntos aumentara la velocidad del juego.\n");
+    mvprintw(8,1, "El juego termina cuando los bloques se acumulan en la parte\n");
+    mvprintw(9,1, "superior de la pantalla.\n\n");
+    
+    mvprintw(10,1, "Controles de juego:\n");
+    mvprintw(11,1, "----------------------------------------------------------------\n");
+    mvprintw(12,1, "Tecla izquierda: Mover el bloque hacia la izquierda.\n");
+    mvprintw(13,1, "Tecla derecha: Mover el bloque hacia la derecha.\n");
+    mvprintw(14,1, "Tecla Abajo: Acelerar la caída del bloque.\n");
+    mvprintw(15,1, "Tecla arriba: Rotar el bloque en sentido horario.\n");
+    mvprintw(16,1, "Espacio: Bajar el bloque de forma instantanea.\n");
+    mvprintw(17,1, "Q: Finalizar juego.");
+    mvprintw(18,1, "----------------------------------------------------------------\n\n");
+    mvprintw(19,1, "Presione enter para continuar...");
+
+    refresh();
+    getch();
+    endwin();
 }
