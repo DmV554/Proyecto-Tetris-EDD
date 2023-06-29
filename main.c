@@ -29,7 +29,7 @@ void mostrarPuntajes(TreeMap*);
 void mostrarBloques(List*);
 void inicializarBloques(List*);
 Bloque* obtenerBloqueAleatorio(List*);
-void dibujarMatrizJuego(int**);
+void dibujarMatrizJuego(int**,int,int);
 void dibujarBloqueActual(Bloque* , int, int );
 void rotarBloqueHorario(Bloque*);
 int verificarColisiones(Bloque*, int, int, int **);
@@ -356,14 +356,16 @@ Bloque* obtenerBloqueAleatorio(List* listaBloques) {
     return bloqueAleatorio;
 }
 
-void dibujarMatrizJuego(int **matrizJuego) { 
-    int i, j;
+void dibujarMatrizJuego(int **matrizJuego, int puntaje,int nivel) { 
+    int i, j, x, y;
 
+    int posX, posY;
+    
     // Dibujar la matriz de juego en la pantalla
     for (i = 0; i < ALTO_JUEGO; i++) {
         for (j = 0; j < ANCHO_JUEGO; j++) {
-            int x = j;  // Coordenada horizontal en la pantalla
-            int y = i;  // Coordenada vertical en la pantalla
+             x = j;  // Coordenada horizontal en la pantalla
+             y = i;  // Coordenada vertical en la pantalla
 
             // Mueve el cursor a la posición (x, y) y dibuja el carácter correspondiente
             move(y, x);
@@ -371,10 +373,23 @@ void dibujarMatrizJuego(int **matrizJuego) {
             if (matrizJuego[i][j] == 0) {
                 addch('.');  // Carácter para celda vacía
             } else {
-                addch('#');  // Carácter para celda ocupada por un bloque
+                addch('*');  // Carácter para celda ocupada por un bloque
             }
         }
     }
+
+
+    posX = ANCHO_JUEGO +50;
+    posY = 0;
+
+    move(posY, posX);
+
+    printw("Puntaje %d", puntaje);
+
+    move(posY+1, posX);
+
+    printw("Nivel %d", nivel);
+
 }
 
 void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
