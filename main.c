@@ -31,7 +31,7 @@ void inicializarBloques(List*);
 Bloque* obtenerBloqueAleatorio(List*);
 void dibujarMatrizJuego(int**);
 void dibujarBloqueActual(Bloque* , int, int );
-Bloque* rotarBloqueHorario(Bloque*);
+void rotarBloqueHorario(Bloque*);
 int verificarColisiones(Bloque*, int, int, int **);
 void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 int verificarFinJuego(int**);
@@ -265,7 +265,7 @@ void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
     int i, j;
 
     // Dibujar el bloque en la posición actual
-    for (i = 0; i < bloqueActual->ancho; i++) {
+    for (i = 0; i < bloqueActual->alto; i++) {
         for (j = 0; j < bloqueActual->ancho; j++) {
             if (bloqueActual->matrizBloque[i][j] != 0) {
                 int x = posX + j;
@@ -273,28 +273,34 @@ void dibujarBloqueActual(Bloque* bloqueActual, int posX, int posY) {
 
                 // Mueve el cursor a la posición (x, y) y dibuja el bloque
                 move(y, x);
-                addch('#'); // Puedes usar otro carácter para representar el bloque
+                addch('*'); // Puedes usar otro carácter para representar el bloque
             }
         }
     }
     
 }
 
-Bloque*rotarBloqueHorario(Bloque*bloqueActual) {
-    Bloque*bloqueNodo = nextList(bloqueActual->listaRotaciones);
+void rotarBloqueHorario(Bloque*bloqueActual) {
+    BloqueRotado*BloqueRotado = nextList(bloqueActual->listaRotaciones);
 
-    if(bloqueNodo == NULL) {
-        bloqueNodo = firstList(bloqueActual->listaRotaciones);
+    if(BloqueRotado == NULL) {
+        BloqueRotado = firstList(bloqueActual->listaRotaciones);
     }
 
-    return bloqueNodo;
+    if(BloqueRotado == NULL) {
+        return;
+    }
+
+    bloqueActual->matrizBloque = BloqueRotado->matrizBloque;
+    bloqueActual->alto = BloqueRotado->alto;
+    bloqueActual->ancho = BloqueRotado->ancho;
 }
 
 int verificarColisiones(Bloque* bloqueActual, int posX, int posY, int **matrizJuego) {
     int i, j;
 
     // Verificar colisión con los límites del tablero
-    for (i = 0; i < bloqueActual->ancho; i++) {
+    for (i = 0; i < bloqueActual->alto; i++) {
         for (j = 0; j < bloqueActual->ancho; j++) {
             if (bloqueActual->matrizBloque[i][j] != 0) {
                 int x = posX + j;
@@ -318,7 +324,7 @@ void fijarBloqueEnMatriz(Bloque* bloqueActual, int posX, int posY, int **matrizJ
     int i, j;
 
     // Colocar el bloque en la matriz de juego en la posición indicada
-    for (i = 0; i < bloqueActual->ancho; i++) {
+    for (i = 0; i < bloqueActual->alto; i++) {
         for (j = 0; j < bloqueActual->ancho; j++) {
             if (bloqueActual->matrizBloque[i][j] != 0) {
                 int x = posX + j;
@@ -397,7 +403,7 @@ void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncur
                 break;
             case KEY_UP:
                 // Rotar el bloque actual en sentido horario
-                bloqueActual = rotarBloqueHorario(bloqueActual);
+                rotarBloqueHorario(bloqueActual);
                 break;
             case 'q':
                 gameover = 1;
@@ -427,6 +433,7 @@ void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncur
     
     endwin();
 }
+
 
 
 void eliminarLineasCompletas(int**matrizJuego,size_t*ptrPuntaje,int *ptrNivel) {
@@ -477,4 +484,5 @@ void eliminarLineasCompletas(int**matrizJuego,size_t*ptrPuntaje,int *ptrNivel) {
     *ptrPuntaje = puntaje;
     *ptrNivel = nivel;
 }
+
 
