@@ -11,7 +11,14 @@ typedef struct Bloque {
     List*listaRotaciones;
     int **matrizBloque;
     int ancho;
-} Bloque;
+    int alto;
+}Bloque;
+
+typedef struct BloqueRotado {
+    int **matrizBloque;
+    int ancho;
+    int alto;
+}BloqueRotado;
 
 void inicializarCuadrado(List*);
 void inicializarL1(List*);
