@@ -11,7 +11,7 @@
 
 #define ENTER 10
 #define ALTO_JUEGO 20
-#define ANCHO_JUEGO 10
+int ANCHO_JUEGO = 10;
 
 const char* nombresDePieza[7] = {"Cuadrado", "L1", "L2", "I", "T", "Z", "S"};
 
@@ -37,6 +37,8 @@ void fijarBloqueEnMatriz(Bloque*, int, int , int **);
 int verificarFinJuego(int**);
 void imprimirTetris(int);
 void eliminarLineasCompletas(int**,size_t*,int*);
+void asignarJugador(size_t, TreeMap*, char*);
+void selectorDificultad(int*, char*);
 
 int lower_than_int(void * key1, void * key2) {
     if(*(int*)key1 > *(int*)key2) return 1;
@@ -354,6 +356,10 @@ void funcionJugar(List* listaBloques, TreeMap* Jugadores) {  // Inicializar ncur
     initscr(); 
     keypad(stdscr, TRUE);  // Habilitar entrada de teclado
 
+
+    char* dificultad = (char*) malloc(sizeof(char) * 10);    
+    selectorDificultad(&ANCHO_JUEGO, dificultad);
+
     int gameover = 0;
     size_t puntaje = 0;
     int nivel = 1;
@@ -485,4 +491,110 @@ void eliminarLineasCompletas(int**matrizJuego,size_t*ptrPuntaje,int *ptrNivel) {
     *ptrNivel = nivel;
 }
 
+void asignarJugador(size_t puntaje, TreeMap * Jugadores, char * dificultad){
+    noecho();
+    nodelay(stdscr, FALSE); 
+    Jugador *jugador = (Jugador*) malloc(sizeof(Jugador));
+ 
+    int maxRows, maxCols;
+    getmaxyx(stdscr, maxRows, maxCols);
+ 
+    clear();
+    move(0,0);
+    move(15,65);
 
+    char mensajeGO[12] = "GAME OVER\n\n";
+
+    int posY = maxRows / 2;
+    int posX = (maxCols - strlen(mensajeGO)) / 2;
+    mvprintw(posY, posX, "%s", mensajeGO);
+
+    printw("SU PUNTAJE ES DE : %zd\n\n\n", puntaje);
+
+    printw("Presione enter para continuar...");
+    refresh();
+    
+    while(true) {
+        if(getch() == ENTER) break;
+    }
+
+    echo();
+
+    clear();
+    char mensajeNU[39] = "INGRESE SU NOMBRE DE USUARIO:\n\n\n";
+
+    posX = (maxCols - strlen(mensajeNU)) / 2;
+    mvprintw(posY, posX, "%s", mensajeNU);
+    refresh();
+
+    getstr(jugador->nombre);
+    if(strcmp(jugador->nombre, "") == 0){
+        strcpy(jugador->nombre, "Desconocido");
+    }
+
+    jugador->puntaje = puntaje;
+    strcpy(jugador->dificultad, dificultad);
+
+    insertTreeMap(Jugadores, &jugador->puntaje, jugador);
+    clear();
+}
+
+void selectorDificultad(int* ancho, char *dificultad){
+    curs_set(0);
+    keypad(stdscr, TRUE); // Habilitar el uso de teclas especiales
+
+    int opcion = 0;
+    int seleccion = 1;
+
+    while (opcion != ENTER) {
+        clear(); // Limpiar la pantalla
+
+        printw("Elige la dificultad con la que deseas jugar:\n");
+        printw("--------------------------------------\n");
+        printw("            %s Facil (15x20)\n", (seleccion == 1) ? "->" : "  ");
+        printw("            %s Normal (10x20)\n", (seleccion == 2) ? "->" : "  ");
+        printw("            %s Dificil (8x20)\n", (seleccion == 3) ? "->" : "  ");
+
+        refresh(); // Actualizar la pantalla
+
+        int tecla = getch(); // Leer la tecla sin esperar a Enter
+
+        switch (tecla) {
+            case KEY_UP:
+                if (seleccion > 1)
+                    seleccion--;
+                break;
+            case KEY_DOWN:
+                if (seleccion < 3)
+                    seleccion++;
+                break;
+            case ENTER:
+                opcion = tecla;
+                break;
+            default:
+                printw("Opcion invalida. Intente de nuevo.\n");
+                break;
+        }
+    }
+
+    switch (seleccion) {
+        case 1:
+            *ancho = 15;
+            strcpy(dificultad, "FACIL");
+            break;
+        case 2:
+            *ancho = 10;
+            strcpy(dificultad, "NORMAL");
+            break;
+        case 3:
+            *ancho = 8;
+            strcpy(dificultad, "DIFICIL");
+            break;
+        default:
+            printw("Opcion invalida. Intente de nuevo.\n");
+            break;
+    }
+
+    refresh(); // Actualizar la pantalla
+
+}
