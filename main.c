@@ -12,6 +12,8 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_timer.h>
 #include <stdbool.h>
+#include <windows.h>
+
 #undef main
 
 #define ENTER 10
@@ -47,15 +49,16 @@ void selectorDificultad(int*, char*);
 void imprimirPuntajes(char*, TreeMap*);
 void mostrarInstrucciones();
 void cargarMusica();
+void adaptarVentana();
 
 int lower_than_int(void * key1, void * key2) {
     if(*(int*)key1 > *(int*)key2) return 1;
     return 0;
 }
 
-
 int main(int argc, char *argv[]) { 
     cargarMusica();
+    adaptarVentana();
 
     TreeMap* Jugadores = createTreeMap(lower_than_int);
     List*listaBloques = createList();
@@ -83,6 +86,13 @@ void inicializarBloques(List*listaBloques) {
     inicializarT(listaBloques);
     inicializarZ(listaBloques);
     inicializarS(listaBloques);
+}
+
+void adaptarVentana() {
+    HWND consoleWindow = GetConsoleWindow();
+    LONG style = GetWindowLong(consoleWindow, GWL_STYLE);
+    style &= ~WS_MAXIMIZEBOX;
+    SetWindowLong(consoleWindow, GWL_STYLE, style);
 }
 
 void cargarMusica() {
